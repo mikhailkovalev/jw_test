@@ -33,6 +33,9 @@ class PostContentAdmin(admin.StackedInline):
     readonly_fields = (
         'views_count',
     )
+    ordering = (
+        'position',
+    )
     extra = 1
 
 

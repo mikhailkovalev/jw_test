@@ -1,4 +1,7 @@
 from django.db import models
+from django.conf import (
+    settings,
+)
 
 from polymorphic.models import (
     PolymorphicModel,
@@ -26,6 +29,21 @@ class AbstractContent(PolymorphicModel):
         through='PostContent'
     )
 
+    def get_short_title(self):
+        result = self.title
+        if len(result) > settings.POST_PREVIEW_LEN:
+            cut_idx = (
+                settings.POST_PREVIEW_LEN - len(settings.POST_PREVIEW_TRAILING))
+            result = ''.join((
+                result[:cut_idx],
+                settings.POST_PREVIEW_TRAILING,
+            ))
+
+        return result
+
+    def __str__(self):
+        return self.get_short_title()
+
 
 class PostContent(models.Model):
     post = models.ForeignKey(
@@ -52,6 +70,13 @@ class PostContent(models.Model):
         verbose_name='Views Count',
         default=0,
     )
+
+    def __str__(self):
+        return '{attachment_type}: {attachment_name}'.format(
+            attachment_type=self.attachment.__class__.__name__,
+            # attachment_type=self.attachment._meta.model_name,
+            attachment_name=str(self.attachment),
+        )
 
 
 class TextContent(AbstractContent):
@@ -82,6 +107,9 @@ class AbstractFile(PolymorphicModel):
         on_delete=models.CASCADE,
         related_name='files',
     )
+
+    def __str__(self):
+        return str(self.file)
 
 
 class SubtitleFile(AbstractFile):
