@@ -3,3 +3,4 @@ djangorestframework==3.12.2
 pyyaml==5.3.1
 django-polymorphic==3.0.0
 lorem==0.1.1
+django-rest-polymorphic==0.1.9
