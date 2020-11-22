@@ -57,10 +57,11 @@ DATE_FORMAT = customization_section['DATE_FORMAT']
 DATETIME_FORMAT = customization_section['DATETIME_FORMAT']
 POST_PREVIEW_LEN = customization_section['POST_PREVIEW_LEN']
 POST_PREVIEW_TRAILING = customization_section['POST_PREVIEW_TRAILING']
+REST_PAGE_SIZE = customization_section['REST_PAGE_SIZE']
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 3,
+    'PAGE_SIZE': REST_PAGE_SIZE,
 }
 
 # Quick-start development settings - unsuitable for production
@@ -134,6 +135,9 @@ for db_conf in DATABASES.values():
     if db_conf['ENGINE'] == 'django.db.backends.sqlite3':
         db_conf['NAME'] = place_relative_path_to_base_dir(
             path=db_conf['NAME'],
+        )
+        db_conf['TEST']['NAME'] = place_relative_path_to_base_dir(
+            path=db_conf['TEST']['NAME'],
         )
 
 
