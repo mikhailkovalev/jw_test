@@ -1,0 +1,7 @@
+.idea/*
+media/*
+static/*
+*.pyc
+*.sqlite3
+*.session
+project_conf.yaml

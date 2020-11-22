@@ -1,0 +1,43 @@
+# By default your config should have name
+# `project_conf.yaml` and store in the folder contains
+# `manage.py`. You can specify your own name and
+# location of this file by putting it into environment
+# variable `JW_TEST_CONF`
+
+databases:
+  # Database params described here will be just assign to `settings.DATABASES`
+  default:
+    ENGINE: your.database.engine  # for example django.db.backends.sqlite3
+
+    # if you use sqlite, you can use relative path,
+    # so it would be based on settings.BASE_DIR
+    NAME: your_database_name
+
+security:
+  ALLOWED_HOSTS:
+   - localhost
+   - another_host
+  DEBUG: true
+  SECRET_KEY: your_secret_key
+
+static:
+  # you can use relative path,
+  # so it would be based on settings.BASE_DIR
+  MEDIA_ROOT: /path/to/media/location/
+  STATIC_ROOT: /path/to/static/location/
+
+  MEDIA_URL: /media/
+  STATIC_URL: /static/
+
+internationalization:
+  LANGUAGE_CODE: your_language
+  TIME_ZONE: your_timezone
+  USE_I18N: true
+  USE_L10N: true
+  USE_TZ: true
+
+customization:
+  DATE_FORMAT: %Y-%m-%d  # date format for strftime
+  DATETIME_FORMAT: %Y-%m-%d %H:%M  # datetime format for strftime
+  POST_PREVIEW_LEN: 10
+  POST_PREVIEW_TRAILING: <...>
