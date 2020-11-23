@@ -52,6 +52,7 @@ databases_section = config['databases']
 static_section = config['static']
 i18n_section = config['internationalization']
 customization_section = config['customization']
+celery_section = config['celery']
 
 DATE_FORMAT = customization_section['DATE_FORMAT']
 DATETIME_FORMAT = customization_section['DATETIME_FORMAT']
@@ -89,8 +90,6 @@ INSTALLED_APPS = [
     # third-party apps
     'rest_framework',
     'polymorphic',
-    'nested_inline',
-    'nested_admin',
 
     # local apps
     'hosting',
@@ -192,3 +191,5 @@ MEDIA_ROOT.mkdir(
     exist_ok=True,
 )
 
+for attr, value in celery_section.items():
+    globals()[f'CELERY_{attr}'] = value

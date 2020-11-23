@@ -41,3 +41,6 @@ customization:
   DATETIME_FORMAT: %Y-%m-%d %H:%M  # datetime format for strftime
   POST_PREVIEW_LEN: 10
   POST_PREVIEW_TRAILING: <...>
+
+celery:
+  BROKER_URL: your_broker_url  # for example: amqp://guest:guest@localhost:5672//
