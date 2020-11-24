@@ -191,5 +191,8 @@ MEDIA_ROOT.mkdir(
     exist_ok=True,
 )
 
+CELERY_NAMESPACE = celery_section['NAMESPACE']
+
 for attr, value in celery_section.items():
-    globals()[f'CELERY_{attr}'] = value
+    if attr != 'NAMESPACE':
+        globals()[f'{CELERY_NAMESPACE}_{attr}'] = value

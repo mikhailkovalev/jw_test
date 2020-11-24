@@ -43,4 +43,8 @@ customization:
   POST_PREVIEW_TRAILING: <...>
 
 celery:
+  NAMESPACE: CELERY
+  # prefix of params in settings.py; for example value
+  # of BROKER_URL will be put to settings.CELERY_BROKER_URL
+
   BROKER_URL: your_broker_url  # for example: amqp://guest:guest@localhost:5672//
