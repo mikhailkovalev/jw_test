@@ -19,7 +19,6 @@ app = Celery(
 
 app.config_from_object(
     'django.conf:settings',
-    namespace=settings.CELERY_NAMESPACE,
 )
 
 app.autodiscover_tasks()

@@ -1,9 +1,16 @@
-from lorem.text import (
-    TextLorem,
+from itertools import (
+    cycle,
+)
+from functools import (
+    lru_cache,
 )
 from random import (
     choice,
     randint,
+)
+
+from lorem.text import (
+    TextLorem,
 )
 from typing import (
     TYPE_CHECKING,
@@ -49,7 +56,7 @@ if TYPE_CHECKING:
 
 class Command(BaseCommand):
     lorem = TextLorem(
-        srange=(30, 50),
+        srange=(1, 3),
         trange=(1, 4),
     )
 
@@ -157,9 +164,8 @@ class Command(BaseCommand):
                 permission,
             )
 
-    @classmethod
     def _create_posts(
-            cls,
+            self,
             posts_count: int,
             publisher: User,
             max_attachments: int,
@@ -177,18 +183,17 @@ class Command(BaseCommand):
                 min_attachments,
                 max_attachments,
             )
-            for position in range(1, 1+attachments_count):
+            for position, fabric_name in zip(range(1, 1+attachments_count), self.fabric_names):
                 PostContent.objects.create(
                     post=post,
-                    attachment=cls._make_attachment(),
+                    attachment=self._make_attachment(fabric_name),
                     position=position,
                 )
 
         return created_posts
 
     @classmethod
-    def _make_attachment(cls):
-        fabric_name = choice(cls._specific_content_fabrics)
+    def _make_attachment(cls, fabric_name):
         return getattr(cls, fabric_name)(
             **cls._make_abstract_content_params(),
         )
@@ -288,4 +293,9 @@ class Command(BaseCommand):
         '_make_audio_content',
         '_make_text_content',
     )
+
+    @property
+    @lru_cache(maxsize=None)
+    def fabric_names(self):
+        return cycle(self._specific_content_fabrics)
 

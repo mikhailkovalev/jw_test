@@ -43,8 +43,11 @@ customization:
   POST_PREVIEW_TRAILING: <...>
 
 celery:
-  NAMESPACE: CELERY
-  # prefix of params in settings.py; for example value
-  # of BROKER_URL will be put to settings.CELERY_BROKER_URL
-
+  CELERY_RESULT_BACKEND: django-db
+  CELERY_CACHE_BACKEND: default
+  CELERY_RESULT_PERSISTENT: False
   BROKER_URL: your_broker_url  # for example: amqp://guest:guest@localhost:5672//
+  CACHES:
+    default:
+      BACKEND: django.core.cache.backends.db.DatabaseCache
+      LOCATION: django_cache_table

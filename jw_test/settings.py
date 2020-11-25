@@ -90,6 +90,7 @@ INSTALLED_APPS = [
     # third-party apps
     'rest_framework',
     'polymorphic',
+    'django_celery_results',
 
     # local apps
     'hosting',
@@ -191,8 +192,5 @@ MEDIA_ROOT.mkdir(
     exist_ok=True,
 )
 
-CELERY_NAMESPACE = celery_section['NAMESPACE']
-
-for attr, value in celery_section.items():
-    if attr != 'NAMESPACE':
-        globals()[f'{CELERY_NAMESPACE}_{attr}'] = value
+# CELERY SETTINGS:
+globals().update(celery_section)
