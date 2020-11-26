@@ -1,0 +1,18 @@
+version: "3"
+services:
+    runserver:
+        build: .
+        command: python manage.py runserver 0.0.0.0:8000
+        ports:
+            - "8000:8000"
+        network_mode: bridge
+    celery:
+        build: .
+        command: python -m celery -A jw_test worker -l info
+        network_mode: bridge
+    autotests:
+        build: .
+        command: python manage.py test --keepdb
+        network_mode: bridge
+        depends_on:
+            - celery
