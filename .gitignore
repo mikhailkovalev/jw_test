@@ -5,3 +5,4 @@ static/*
 *.sqlite3
 *.session
 project_conf.yaml
+project_test_conf.yaml

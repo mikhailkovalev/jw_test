@@ -7,6 +7,7 @@ RUN mkdir /jw_test \
   && mkdir /jw_test/migrations
 COPY manage.py \
     project_conf.yaml \
+    project_test_conf.yaml \
     requirements.txt \
     # destination folder
     /jw_test/

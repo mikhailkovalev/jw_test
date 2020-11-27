@@ -18,9 +18,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# See file `project_conf_example.yaml` to write own configuration file
-CONFIG_PATH = os.getenv('JW_TEST_CONF') or BASE_DIR / 'project_conf.yaml'
-
 
 def place_relative_path_to_base_dir(path: str) -> str:
     if not os.path.isabs(path):
@@ -31,13 +28,19 @@ def place_relative_path_to_base_dir(path: str) -> str:
     return path
 
 
+# See file `project_conf_example.yaml` to write own configuration file
+CONFIG_PATH = os.getenv('JW_TEST_CONF') or BASE_DIR / 'project_conf.yaml'
+CONFIG_PATH = place_relative_path_to_base_dir(CONFIG_PATH)
+print('CONFIG_PATH:', CONFIG_PATH)
+
+
 def read_config(config_path):
     config_file = open(
         config_path,
         mode='rt',
         encoding='utf-8',
     )
-    with config_path:
+    with config_file:
         config = yaml.load(
             config_file,
             Loader=yaml.FullLoader,
