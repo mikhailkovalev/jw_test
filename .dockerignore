@@ -1,0 +1,6 @@
+.git/
+static/*
+media/*
+**/*.pyc
+**/__pycache__
+*.sqlite3
