@@ -26,3 +26,7 @@ services:
             JW_TEST_CONF: project_test_conf.yaml
         depends_on:
             - celery_testing
+    demo_data:
+        build: .
+        command: python manage.py generate_dummy_data
+        network_mode: bridge
