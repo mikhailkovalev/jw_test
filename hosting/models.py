@@ -46,6 +46,10 @@ class AbstractContent(PolymorphicModel):
 
 
 class PostContent(models.Model):
+    class Meta:
+        ordering = (
+            'position',
+        )
     post = models.ForeignKey(
         verbose_name='Post',
         to=Post,
@@ -58,13 +62,12 @@ class PostContent(models.Model):
         on_delete=models.CASCADE,
         related_name='+',
     )
-    position = models.FloatField(
+    position = models.PositiveIntegerField(
         verbose_name='Attachment\'s Position',
+        default=0,
+        blank=False,
+        null=False,
     )
-    # it's float to easier put some content between
-    # any two positions in post, for example if we
-    # wanna insert a new content between 2 and 3
-    # positions we can assign value 2.5
 
     views_count = models.PositiveIntegerField(
         verbose_name='Views Count',

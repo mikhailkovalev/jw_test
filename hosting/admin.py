@@ -2,6 +2,9 @@ from functools import (
     lru_cache,
 )
 
+from adminsortable2.admin import (
+    SortableInlineAdminMixin,
+)
 from django.contrib import (
     admin,
 )
@@ -23,18 +26,14 @@ from .models import (
 )
 
 
-class PostContentAdmin(admin.StackedInline):
+class PostContentAdmin(SortableInlineAdminMixin, admin.StackedInline):
     model = PostContent
     fields = (
         'attachment',
-        'position',
         'views_count',
     )
     readonly_fields = (
         'views_count',
-    )
-    ordering = (
-        'position',
     )
     extra = 1
 

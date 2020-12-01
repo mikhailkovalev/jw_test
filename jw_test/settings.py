@@ -115,6 +115,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'polymorphic',
     'django_celery_results',
+    'adminsortable2',
 
     # local apps
     'hosting',
