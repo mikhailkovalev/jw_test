@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 import os
+import sys
 import yaml
 
 from pathlib import Path
@@ -27,58 +28,78 @@ def place_relative_path_to_base_dir(path: str) -> str:
         ))
     return path
 
+DEMO_SECRET_KEY = 'jw-test-demo-secret-key'
 
-# See file `project_conf_example.yaml` to write own configuration file
-CONFIG_PATH = os.getenv('JW_TEST_CONF') or BASE_DIR / 'project_conf.yaml'
-CONFIG_PATH = place_relative_path_to_base_dir(CONFIG_PATH)
-print('CONFIG_PATH:', CONFIG_PATH)
+default_settings = {
+    # customization
+    'DATE_FORMAT': '%Y-%m-%d',
+    'DATETIME_FORMAT': '%Y-%m-%d %H:%M',
+    'POST_PREVIEW_LEN': 30,
+    'POST_PREVIEW_TRAILING': '<...>',
+    'REST_PAGE_SIZE': 50,
 
+    # security
+    'SECRET_KEY': DEMO_SECRET_KEY,
+    'DEBUG': True,
+    'ALLOWED_HOSTS': [
+        '127.0.0.1',
+        'localhost',
+    ],
 
-def read_config(config_path):
-    config_file = open(
-        config_path,
-        mode='rt',
-        encoding='utf-8',
+    # databases
+    'DEFAULT_DB_ENGINE': 'django.db.backends.postgresql_psycopg2',
+    'DEFAULT_DB_NAME': 'jw_test_db',
+    'DEFAULT_DB_HOST': 'demo-db',
+    'DEFAULT_DB_PORT': 5432,
+    'DEFAULT_DB_USER': 'demo',
+    'DEFAULT_DB_PASSWORD': 'demo',
+    'DEFAULT_TEST_DB_NAME': 'jw_test_db',
+
+    # static
+    'MEDIA_ROOT': './media',
+    'MEDIA_URL': '/media/',
+    'STATIC_ROOT': './static',
+    'STATIC_URL': '/static/',
+
+    # internationalization
+    'LANGUAGE_CODE': 'en-us',
+    'TIME_ZONE': 'Europe/Volgograd',
+    'USE_I18N': True,
+    'USE_L10N': True,
+    'USE_TZ': True,
+
+    # caches
+    'DEFAULT_CACHE_BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+    'DEFAULT_CACHE_LOCATION': 'django_cache_table',
+
+    # celery
+    'CELERY_RESULT_BACKEND': 'django-db',
+    'CELERY_CACHE_BACKEND': 'default',
+    'CELERY_RESULT_PERSISTENT': False,
+    'BROKER_URL': 'amqp://guest:guest@rabbit:5672//',
+}
+
+globals().update({
+    var: os.getenv(var, default_value)
+    for var, default_value in default_settings.items()
+})
+if SECRET_KEY == DEMO_SECRET_KEY:
+    print(
+        'SECRET_KEY is not provided! DEMO_SECRET_KEY is used instead',
+        file=sys.stderr,
     )
-    with config_file:
-        config = yaml.load(
-            config_file,
-            Loader=yaml.FullLoader,
-        )
 
-        return config
-
-
-config = read_config(CONFIG_PATH)
-security_section = config['security']
-databases_section = config['databases']
-static_section = config['static']
-i18n_section = config['internationalization']
-customization_section = config['customization']
-celery_section = config['celery']
-
-DATE_FORMAT = customization_section['DATE_FORMAT']
-DATETIME_FORMAT = customization_section['DATETIME_FORMAT']
-POST_PREVIEW_LEN = customization_section['POST_PREVIEW_LEN']
-POST_PREVIEW_TRAILING = customization_section['POST_PREVIEW_TRAILING']
-REST_PAGE_SIZE = customization_section['REST_PAGE_SIZE']
+CACHES = {
+    'default': dict(
+        BACKEND=DEFAULT_CACHE_BACKEND,
+        LOCATION=DEFAULT_CACHE_LOCATION,
+    ),
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': REST_PAGE_SIZE,
 }
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = security_section['SECRET_KEY']
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = security_section['DEBUG']
-
-ALLOWED_HOSTS = security_section['ALLOWED_HOSTS']
-
 
 # Application definition
 
@@ -133,15 +154,19 @@ WSGI_APPLICATION = 'jw_test.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-DATABASES = databases_section
-for db_conf in DATABASES.values():
-    if db_conf['ENGINE'] == 'django.db.backends.sqlite3':
-        db_conf['NAME'] = place_relative_path_to_base_dir(
-            path=db_conf['NAME'],
-        )
-        db_conf['TEST']['NAME'] = place_relative_path_to_base_dir(
-            path=db_conf['TEST']['NAME'],
-        )
+DATABASES = {
+    'default': dict(
+        ENGINE=DEFAULT_DB_ENGINE,
+        NAME=DEFAULT_DB_NAME,
+        HOST=DEFAULT_DB_HOST,
+        PORT=DEFAULT_DB_PORT,
+        USER=DEFAULT_DB_USER,
+        PASSWORD=DEFAULT_DB_PASSWORD,
+        TEST={
+            'NAME': DEFAULT_TEST_DB_NAME,
+        },
+    ),
+}
 
 
 # Password validation
@@ -163,37 +188,18 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/3.1/topics/i18n/
-
-LANGUAGE_CODE = i18n_section['LANGUAGE_CODE']
-
-TIME_ZONE = i18n_section['TIME_ZONE']
-
-USE_I18N = i18n_section['USE_I18N']
-
-USE_L10N = i18n_section['USE_L10N']
-
-USE_TZ = i18n_section['USE_TZ']
-
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_URL = static_section['STATIC_URL']
 STATIC_ROOT = place_relative_path_to_base_dir(
-    path=static_section['STATIC_ROOT'],
+    path=STATIC_ROOT,
 )
 
-MEDIA_URL = static_section['MEDIA_URL']
 MEDIA_ROOT = Path(place_relative_path_to_base_dir(
-    path=static_section['MEDIA_ROOT'],
+    path=MEDIA_ROOT,
 ))
 MEDIA_ROOT.mkdir(
     mode=0o755,
     parents=True,
     exist_ok=True,
 )
-
-# CELERY SETTINGS:
-globals().update(celery_section)

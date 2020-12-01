@@ -1,32 +1,42 @@
 version: "3"
 services:
+    demo-db:
+        image: postgres:13.1-alpine
+        volumes:
+            - './postgres-init:/docker-entrypoint-initdb.d/'
+        environment:
+            POSTGRES_PASSWORD: postgres
+    rabbit:
+        image: rabbitmq:3.7.11-alpine
     celery:
         build: .
         command: python -m celery -A jw_test worker -l info
-        network_mode: bridge
+        depends_on:
+            - demo-db
+            - rabbit
+
     runserver:
         build: .
-        command: python manage.py runserver 0.0.0.0:8000
+        command: bash -c "python manage.py migrate
+            && python manage.py createcachetable django_cache_table
+            && python manage.py generate_dummy_data -u admin
+            && python manage.py runserver 0.0.0.0:8000"
         ports:
             - "8000:8000"
-        network_mode: bridge
         depends_on:
+            - demo-db
+            - rabbit
             - celery
     celery_testing:
         build: .
         command: python -m celery -A jw_test worker -l info
-        network_mode: bridge
-        environment:
-            JW_TEST_CONF: project_test_conf.yaml
+        depends_on:
+            - demo-db
+            - rabbit
     autotests:
         build: .
-        command: python manage.py test --keepdb
-        network_mode: bridge
-        environment:
-            JW_TEST_CONF: project_test_conf.yaml
+        command: bash -c "python manage.py createcachetable django_cache_table && python manage.py test --keepdb"
         depends_on:
+            - demo-db
+            - rabbit
             - celery_testing
-    demo_data:
-        build: .
-        command: python manage.py generate_dummy_data
-        network_mode: bridge

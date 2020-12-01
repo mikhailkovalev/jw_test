@@ -4,5 +4,6 @@ static/*
 *.pyc
 *.sqlite3
 *.session
+*.env
 project_conf.yaml
 project_test_conf.yaml
