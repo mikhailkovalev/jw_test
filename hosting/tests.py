@@ -32,9 +32,6 @@ from rest_framework.test import (
     force_authenticate,
 )
 
-from .helpers import (
-    LOCK_EXPIRE,
-)
 from .management.commands.generate_dummy_data import (
     Command as GenerateDummyDataCommand,
 )
@@ -47,6 +44,7 @@ from .models import (
     VideoContent,
 )
 from .tasks import (
+    LOCK_EXPIRE,
     increment_views_count,
 )
 from .views import (
