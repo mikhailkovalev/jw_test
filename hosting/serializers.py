@@ -2,7 +2,6 @@ from django.contrib.auth.models import (
     User,
 )
 from rest_framework.serializers import (
-    CharField,
     HyperlinkedModelSerializer,
     ModelSerializer,
     SerializerMethodField,
@@ -131,18 +130,6 @@ class VideoContentSerializer(FileContentSerializer):
         )
 
 
-class PostContentSerializer(ModelSerializer):
-    title = CharField(source='attachment.title')
-
-    class Meta:
-        model = PostContent
-        fields = (
-            'title',
-            'position',
-            'views_count',
-        )
-
-
 class ContentPolymorphicSerializer(PolymorphicSerializer):
     model_serializer_mapping = {
         TextContent: TextContentSerializer,
@@ -151,23 +138,34 @@ class ContentPolymorphicSerializer(PolymorphicSerializer):
     }
 
 
+class PostContentSerializer(ModelSerializer):
+    attachment = ContentPolymorphicSerializer()
+
+    def to_representation(self, instance):
+        result = super().to_representation(instance)
+
+        result.update(result['attachment'])
+        del result['attachment']
+
+        return result
+
+    class Meta:
+        model = PostContent
+        fields = (
+            'position',
+            'views_count',
+            'attachment',
+        )
+
+
 class PostDetailedSerializer(PostSerializer):
-    attachments = SerializerMethodField('get_attachments')
+    attachments = PostContentSerializer(
+        many=True,
+        source='post_contents',
+    )
 
     class Meta(PostSerializer.Meta):
         model = Post
         fields = PostSerializer.Meta.fields + (
             'attachments',
-        )
-
-    def get_attachments(self, obj):
-        post_attachments = PostContent.objects.filter(
-            post=obj,
-        )
-        return tuple(
-            {
-                **PostContentSerializer(post_attachment).data,
-                **ContentPolymorphicSerializer(post_attachment.attachment).data,
-            }
-            for post_attachment in post_attachments
         )

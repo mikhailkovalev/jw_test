@@ -54,7 +54,7 @@ class PostContent(models.Model):
         verbose_name='Post',
         to=Post,
         on_delete=models.CASCADE,
-        related_name='+',
+        related_name='post_contents',
     )
     attachment = models.ForeignKey(
         verbose_name='Content',
